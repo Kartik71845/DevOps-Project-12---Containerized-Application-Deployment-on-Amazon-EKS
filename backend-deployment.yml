@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend-deployment
+  namespace: myapp
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers: 
+        - name: backend-v1
+          image: kartik71845/backend:v1
+          ports:
+            - containerPort: 5000
+          
+          envFrom:
+            - secretRef:
+                name: backend-db-secret
+                  
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+         
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
